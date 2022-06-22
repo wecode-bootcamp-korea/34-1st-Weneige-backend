@@ -1,16 +1,17 @@
 from django.db import models
 
 class Product(models.Model):
-    kor_name    = models.CharField(max_length=100)
-    eng_name    = models.CharField(max_length=100)
-    price       = models.DecimalField(max_digits=7, decimal_places=0)
-    description = models.TextField(max_length=100)
+    kor_name       = models.CharField(max_length=100)
+    eng_name       = models.CharField(max_length=100)
+    price          = models.DecimalField(max_digits=7, decimal_places=2)
+    description    = models.CharField(max_length=100)
+    tags           = models.ManyToManyField("Tag", through="ProductTag", related_name="tag")
+    sub_categories = models.ManyToManyField("SubCategory", through="CategoryProduct", related_name="sub_category")
 
     class Meta:
         db_table = "products"
 
 class Tag(models.Model):
-    product = models.ManyToManyField("Product", through="ProductTag", related_name="tag")
     name    = models.CharField(max_length=100)
 
     class Meta:
@@ -18,7 +19,7 @@ class Tag(models.Model):
 
 class ProductTag(models.Model):
     product = models.ForeignKey("Product", on_delete=models.CASCADE)
-    tags    = models.ForeignKey("Tag", on_delete=models.CASCADE)
+    tag     = models.ForeignKey("Tag", on_delete=models.CASCADE)
 
     class Meta:
         db_table = "product_tags"
@@ -36,9 +37,9 @@ class Volume(models.Model):
         db_table = "volume"
 
 class ProductOption(models.Model):
-    product  = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="products_option")
-    color    = models.ForeignKey("Color", on_delete=models.CASCADE, related_name="colors_option")
-    volume   = models.ForeignKey("Volume", on_delete=models.CASCADE, related_name="volume_option")
+    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="products_option")
+    color   = models.ForeignKey("Color", on_delete=models.CASCADE, related_name="colors_option")
+    volume  = models.ForeignKey("Volume", on_delete=models.CASCADE, related_name="volume_option")
 
     class Meta:
         db_table = "product_options"
@@ -64,22 +65,22 @@ class MainCategory(models.Model):
         db_table = "main_categories"
 
 class MidCategory(models.Model):
-    product = models.ForeignKey("MainCategory", on_delete=models.CASCADE, related_name="mid_categories")
-    name    = models.CharField(max_length=50)
+    main_category = models.ForeignKey("MainCategory", on_delete=models.CASCADE, related_name="mid_categories")
+    name          = models.CharField(max_length=50)
 
     class Meta:
         db_table = "mid_categories"
 
 class SubCategory(models.Model):
-    product = models.ForeignKey("MidCategory", on_delete=models.CASCADE, related_name="sub_categories")
-    name    = models.CharField(max_length=50)
+    mid_category = models.ForeignKey("MidCategory", on_delete=models.CASCADE, related_name="sub_categories")
+    name         = models.CharField(max_length=50)
 
     class Meta:
         db_table = "sub_categories"
 
 class CategoryProduct(models.Model):
-    category = models.ForeignKey("SubCategory", on_delete=models.CASCADE, related_name="category")    
-    product  = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="product")
+    sub_category = models.ForeignKey("SubCategory", on_delete=models.CASCADE)    
+    product      = models.ForeignKey("Product", on_delete=models.CASCADE)
 
     class Meta:
         db_table = "categories_products"

@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.create_datetime import BaseModel
+from core.create_datetime import BaseModel
 from users.models          import User
 from products.models       import ProductOption
 
