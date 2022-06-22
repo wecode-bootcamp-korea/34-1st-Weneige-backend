@@ -1,6 +1,6 @@
 from ast import For
 from django.db        import models
-from core.create_datetime  import BaseModel
+from core.models  import BaseModel
 
 class User(BaseModel):
     name          = models.CharField(max_length=60)
@@ -9,5 +9,6 @@ class User(BaseModel):
     user_name     = models.CharField(max_length=50, unique=True)
     address       = models.CharField(max_length=50, default="")
     mobile_number = models.CharField(max_length=50, default="")
+    
     class Meta:
         db_table = "users"
