@@ -10,7 +10,7 @@ from django.conf            import settings
 from .validation            import validate_email, validate_password
 from .models                import User
 
-class SignUp(View):
+class SignUpView(View):
     def post(self, request):
         try :
             data = json.loads(request.body)
@@ -50,7 +50,7 @@ class SignUp(View):
         except ValidationError as e:
             return JsonResponse({'MESSAGE' : (e.message)}, status = 400)
 
-class LogIn(View):
+class LogInView(View):
     def post(self, request):
         try :
             data          = json.loads(request.body)
