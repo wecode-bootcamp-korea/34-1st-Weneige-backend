@@ -13,3 +13,6 @@ def validate_password(value):
 
     if not re.match(REGEX_PASSWORD, value):
         raise ValidationError('INVALID_PASSWORD')
+
+
+        
