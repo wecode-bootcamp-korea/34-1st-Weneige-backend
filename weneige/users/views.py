@@ -1,16 +1,14 @@
 import json
-from unicodedata import name
 import bcrypt
 import jwt
 
 from django.core.exceptions import ValidationError
-from django.shortcuts       import render
 from django.http            import JsonResponse
 from django.views           import View
+from django.conf            import settings
 
 from .validation            import validate_email, validate_password
 from .models                import User
-from weneige.settings       import SECRET_KEY, ALGORITHM
 
 class SignUp(View):
     def post(self, request):
@@ -50,11 +48,10 @@ class SignUp(View):
             return JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status = 400)
 
         except ValidationError as e:
-            return JsonResponse({"MESSAGE" : (e.message)}, status = 400)
+            return JsonResponse({'MESSAGE' : (e.message)}, status = 400)
 
 class LogIn(View):
     def post(self, request):
-        
         try :
             data          = json.loads(request.body)
             user_email    = data['email']
@@ -71,7 +68,7 @@ class LogIn(View):
             if not bcrypt.checkpw( encoded_user_password, encoded_db_password ):
                 return JsonResponse({'MESSAGE' : 'INVALID_PASSWORD'}, status = 401)
 
-            token = jwt.encode({'user_id' : user.id}, SECRET_KEY, ALGORITHM)
+            token = jwt.encode({'user_id' : user.id}, settings.SECRET_KEY, settings.ALGORITHM)
             return JsonResponse({'token' : token}, status = 200)
                 
         except KeyError :
