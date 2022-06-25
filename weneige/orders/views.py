@@ -3,7 +3,7 @@ import json
 from django.http            import JsonResponse
 from django.views           import View
 
-from ..core.utils           import login_decorator
+from core.utils             import login_decorator
 from .models                import Order, OrderStatus
 from products.models        import ProductImage, ProductOption
 
@@ -23,7 +23,7 @@ class OrderView(View):
                 quantity        = quantity,
                 address         = user.address,
                 mobile_number   = user.mobile_number,
-                order_status    = OrderStatus.object.get(id=1).name
+                order_status    = OrderStatus.objects.get(id=1)
             )
         
             return JsonResponse({'MESSAGE' : 'SUCCESS'}, status = 201)
@@ -41,14 +41,14 @@ class OrderView(View):
         results     = [
             {
                 "order_id"  : user_order.id,
-                "kor_name"  : user_order.option_order.product.kor_name,
-                "eng_name"  : user_order.option_order.product.eng_name,
-                "color"     : user_order.option_order.color.name,
-                "volume"    : user_order.option_order.color.name,
-                "price"     : user_order.option_order.product.price,
+                "kor_name"  : user_order.product_option.product.kor_name,
+                "eng_name"  : user_order.product_option.product.eng_name,
+                "color"     : user_order.product_option.color.name,
+                "volume"    : user_order.product_option.color.name,
+                "price"     : user_order.product_option.product.price,
                 "quantity"  : user_order.quantity,
                 "address"   : user_order.address,
-                "image_url" : [url.image_url for url in ProductImage.objects.filter(id=user_order.option_order.product_id)]
+                "image_url" : [url.image_url for url in ProductImage.objects.filter(product_id=user_order.product_option.product_id)]
                 } for user_order in user_orders
         ]
         return JsonResponse({'results' : results}, status = 200)
