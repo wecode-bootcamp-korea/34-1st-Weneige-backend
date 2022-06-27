@@ -10,7 +10,6 @@ class Order(BaseModel):
     quantity       = models.IntegerField()
     address        = models.CharField(max_length=100)
     mobile_number  = models.CharField(max_length=100)
-    order_number   = models.CharField(max_length=30)
     order_status   = models.ForeignKey("OrderStatus", on_delete=models.CASCADE, related_name="order_status")
 
     class Meta:
