@@ -11,26 +11,54 @@ from core.utils      import login_decorator
 class CartView(View):
     @login_decorator
     def post(self, request):
+        # try :
+        #     data              = json.loads(request.body)
+        #     user              = request.user
+        #     product_option_id = data["product_option_id"]
+        #     quantity          = data["quantity"]
+
+        #     if not ProductOption.objects.filter(id=product_option_id).exists():
+        #         return JsonResponse({"message" : "PRODUCT_OPTION_NOT_EXIST"}, status=404)
+
+        #     if Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
+        #         cart          = Cart.objects.filter(user=user).get(product_option_id=product_option_id)
+        #         cart.quantity = quantity
+        #         cart.save()
+        #         return JsonResponse({"MESSAGE" : "PRODUCT_QUNATITY_UPDATED"}, status=201)
+
+        #     Cart.objects.create(
+        #         user           = user,
+        #         product_option = ProductOption.objects.get(id=product_option_id),
+        #         quantity       = quantity
+        #     )
+        #     return JsonResponse({'MESSAGE' : 'CART_CREATED'}, status = 201)
+        
+        # except KeyError:
+        #     return JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status = 400)
+
         try :
             data              = json.loads(request.body)
             user              = request.user
-            product_option_id = data["product_option_id"]
-            quantity          = data["quantity"]
 
-            if not ProductOption.objects.filter(id=product_option_id).exists():
-                return JsonResponse({"message" : "PRODUCT_OPTION_NOT_EXIST"}, status=404)
+            for i in range(len(data)):
+                product_option_id = data[i]["product_option_id"]
+                quantity          = data[i]["quantity"]
 
-            if Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
-                cart          = Cart.objects.filter(user=user).get(product_option_id=product_option_id)
-                cart.quantity = quantity
-                cart.save()
-                return JsonResponse({"MESSAGE" : "PRODUCT_QUNATITY_UPDATED"}, status=201)
+                if not ProductOption.objects.filter(id=product_option_id).exists():
+                    return JsonResponse({"message" : "PRODUCT_OPTION_NOT_EXIST"}, status=404)
 
-            Cart.objects.create(
-                user           = user,
-                product_option = ProductOption.objects.get(id=product_option_id),
-                quantity       = quantity
-            )
+                if Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
+                    cart          = Cart.objects.filter(user=user).get(product_option_id=product_option_id)
+                    cart.quantity += quantity
+                    cart.save()
+                    return JsonResponse({"MESSAGE" : "PRODUCT_QUNATITY_UPDATED"}, status=201)
+
+                Cart.objects.create(
+                    user           = user,
+                    product_option = ProductOption.objects.get(id=product_option_id),
+                    quantity       = quantity
+                )
+                
             return JsonResponse({'MESSAGE' : 'CART_CREATED'}, status = 201)
         
         except KeyError:
@@ -64,7 +92,7 @@ class CartView(View):
             data              = json.load(request.body)
             user              = request.user
             product_option_id = data['product_option_id']
-            quantity          = data['quantity']
+            quantity          += data['quantity']
 
             if not Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
                 return JsonResponse({"MESSAGE" : "CART_NOT_EXIST"}, status=404)
