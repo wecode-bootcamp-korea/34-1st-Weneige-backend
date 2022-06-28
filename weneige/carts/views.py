@@ -1,3 +1,96 @@
-from django.shortcuts import render
+import json
+import re
 
-# Create your views here.
+from django.http  import JsonResponse
+from django.views import View
+
+from carts.models    import Cart
+from products.models import ProductOption, ProductImage
+from core.utils      import login_decorator
+
+class CartView(View):
+    @login_decorator
+    def post(self, request):
+        try :
+            data              = json.loads(request.body)
+            user              = request.user
+            product_option_id = data["product_option_id"]
+            quantity          = data["quantity"]
+
+            if not ProductOption.objects.filter(id=product_option_id).exists():
+                return JsonResponse({"message" : "PRODUCT_OPTION_NOT_EXIST"}, status=404)
+
+            if Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
+                cart          = Cart.objects.filter(user=user).get(product_option_id=product_option_id)
+                cart.quantity = quantity
+                cart.save()
+                return JsonResponse({"MESSAGE" : "PRODUCT_QUNATITY_UPDATED"}, status=201)
+
+            Cart.objects.create(
+                user           = user,
+                product_option = ProductOption.objects.get(id=product_option_id),
+                quantity       = quantity
+            )
+            return JsonResponse({'MESSAGE' : 'CART_CREATED'}, status = 201)
+        
+        except KeyError:
+            return JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status = 400)
+            
+    @login_decorator
+    def get(self, request):
+        user        = request.user
+        user_cart   = user.user_cart.filter(user_id=user.id)
+
+        if not user_cart.exists():
+            return JsonResponse({"message" : "CART_NOT_EXIST"}, status=404)
+
+        results     = [
+            {
+                "product_options_id" : item.product_option.id,
+                "kor_name"           : item.product_option.product.kor_name,
+                "color"              : item.product_option.color.name,
+                "price"              : int(item.product_option.product.price),
+                "quantity"           : item.quantity,
+                "name"               : user.name,
+                "address"            : user.address,
+                "image_url"          : ProductImage.objects.filter(product_id=item.product_option.product_id)[0].image_url
+                } for item in user_cart
+        ]
+        return JsonResponse({'results' : results}, status = 200)
+
+    @login_decorator
+    def patch(self, request):
+        try:
+            data              = json.load(request.body)
+            user              = request.user
+            product_option_id = data['product_option_id']
+            quantity          = data['quantity']
+
+            if not Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
+                return JsonResponse({"MESSAGE" : "CART_NOT_EXIST"}, status=404)
+
+            cart          = Cart.objects.get(user=user, product_option_id=product_option_id)
+            cart.quantity = quantity
+            cart.save()
+
+            if cart.quantity <= 0:
+                return JsonResponse({"message": "PRODUCT_QUANTITY_ERROR"}, status=400)
+
+            return JsonResponse({"message": "SUCCESS"}, status=201)
+
+        except Cart.DoesNotExist:
+            return JsonResponse({"message": "CART_NOT_EXIST"}, status=404)  
+
+        except KeyError:
+            return JsonResponse({"message": "KEY_ERROR"}, status=400)
+
+    @login_decorator
+    def delete(self, request):
+        cart_remove_list = request.GET.getlist('cart_id', None)
+        cart             = Cart.objects.filter(id__in=cart_remove_list, user=request.user)
+
+        if not cart.exists():
+            return JsonResponse({"message": "CART_NOT_EXIST"}, status=404)
+        
+        cart.delete()
+        return JsonResponse({"message": "CART_DELETED"}, status=204)
