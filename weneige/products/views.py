@@ -1,4 +1,3 @@
-import colorsys
 from django.http            import JsonResponse
 from django.views           import View
 from django.db.models       import Q
@@ -12,8 +11,8 @@ class ProductDetailView(View):
 
         product         = Product.objects.get(id=product_id)
         product_options = ProductOption.objects.filter(product_id=product_id)
-        colors          = [Color.objects.get(id=product_option.color_id).name for product_option in product_options]
-        color_id        = [Color.objects.get(id=product_option.color_id).id for product_option in product_options]
+        colors          = Color.objects.filter(colors_option__product__id=product.id)
+
 
         product_detail = {
                     "product_id"  : product.id,
@@ -22,8 +21,10 @@ class ProductDetailView(View):
                     "description" : product.description,
                     "volume"      : Volume.objects.get(id=product_options[0].volume_id).name,
                     "price"       : int(product.price),
-                    "color"       : colors,
-                    "color_id"    : {color_id : color for color_id, color in zip(color_id, colors)},
+                    "color"       : [{
+                        "color_id"   : color.id,
+                        "color_name" : color.name
+                    }for color in colors],
                     "image_url"   : [url.image_url for url in ProductImage.objects.filter(product_id=product.id)]
                 }
             
@@ -31,26 +32,32 @@ class ProductDetailView(View):
 
 class ProductListView(View):
     def get(self, request):
-        products = Product.objects.all()
-        product_detail  = []
-
-        for product in products:
-            product_detail.append(
-                {   
-                    "product_id" : product.id,
-                    "kor_name"   : product.kor_name,
-                    "price"      : int(product.price),
-                    "image_url"  : [url.image_url for url in ProductImage.objects.filter(product_id=product.id)]
-                }
-            )
+        """
+        http -v GET localhost:8000/products?offset=0&limit=6
+        """
+        offset   = int(request.GET.get('offset', 0))
+        limit    = int(request.GET.get('limit', 6))
+        products = Product.objects.all()[offset:offset+limit]
         
-        return JsonResponse({'product_detail' : product_detail}, status = 200)
+        product_list = [{
+            "product_id" : product.id,
+            "kor_name"   : product.kor_name,
+            "price"      : int(product.price),
+            "image_url"  : [url.image_url for url in ProductImage.objects.filter(product_id=product.id)]
+        }for product in products]
+        
+        return JsonResponse({'products' : product_list}, status = 200)
 
 class ProductSearchView(View):
     def get(self, request):
-        search = request.GET.get("search",'')
+        """
+        http -v GET localhost:8000/products/search?text=마스카라
+
+        listcomprohension
+        """
+        search = request.GET.get("text", None)
         
-        search_list = Product.objects.filter(
+        products = Product.objects.filter(
                 Q(kor_name__icontains = search) |
                 Q(eng_name__icontains = search)
                 )
@@ -66,4 +73,5 @@ class ProductSearchView(View):
                     "image_url"   : [url.image_url for url in ProductImage.objects.filter(product_id=product.id)]
                 }
             )
-        return JsonResponse({'product_detail' : product_detail}, status = 200)
+
+        return JsonResponse({'products' : product_list}, status = 200)
