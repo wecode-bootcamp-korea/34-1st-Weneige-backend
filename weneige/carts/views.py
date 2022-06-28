@@ -1,5 +1,4 @@
 import json
-import re
 
 from django.http  import JsonResponse
 from django.views import View
@@ -11,31 +10,6 @@ from core.utils      import login_decorator
 class CartView(View):
     @login_decorator
     def post(self, request):
-        # try :
-        #     data              = json.loads(request.body)
-        #     user              = request.user
-        #     product_option_id = data["product_option_id"]
-        #     quantity          = data["quantity"]
-
-        #     if not ProductOption.objects.filter(id=product_option_id).exists():
-        #         return JsonResponse({"message" : "PRODUCT_OPTION_NOT_EXIST"}, status=404)
-
-        #     if Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
-        #         cart          = Cart.objects.filter(user=user).get(product_option_id=product_option_id)
-        #         cart.quantity = quantity
-        #         cart.save()
-        #         return JsonResponse({"MESSAGE" : "PRODUCT_QUNATITY_UPDATED"}, status=201)
-
-        #     Cart.objects.create(
-        #         user           = user,
-        #         product_option = ProductOption.objects.get(id=product_option_id),
-        #         quantity       = quantity
-        #     )
-        #     return JsonResponse({'MESSAGE' : 'CART_CREATED'}, status = 201)
-        
-        # except KeyError:
-        #     return JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status = 400)
-
         try :
             data              = json.loads(request.body)
             user              = request.user
@@ -47,18 +21,18 @@ class CartView(View):
                 if not ProductOption.objects.filter(id=product_option_id).exists():
                     return JsonResponse({"message" : "PRODUCT_OPTION_NOT_EXIST"}, status=404)
 
-                if Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
-                    cart          = Cart.objects.filter(user=user).get(product_option_id=product_option_id)
-                    cart.quantity += quantity
-                    cart.save()
-                    return JsonResponse({"MESSAGE" : "PRODUCT_QUNATITY_UPDATED"}, status=201)
-
-                Cart.objects.create(
+                cart, is_created = Cart.objects.get_or_create(
                     user           = user,
                     product_option = ProductOption.objects.get(id=product_option_id),
-                    quantity       = quantity
+                    defaults={
+                        "quantity" : quantity
+                    }
                 )
-                
+
+                if not is_created:
+                    cart.quantity += quantity
+                cart.save()
+                    
             return JsonResponse({'MESSAGE' : 'CART_CREATED'}, status = 201)
         
         except KeyError:
@@ -85,32 +59,6 @@ class CartView(View):
                 } for item in user_cart
         ]
         return JsonResponse({'results' : results}, status = 200)
-
-    @login_decorator
-    def patch(self, request):
-        try:
-            data              = json.load(request.body)
-            user              = request.user
-            product_option_id = data['product_option_id']
-            quantity          += data['quantity']
-
-            if not Cart.objects.filter(user=user, product_option_id=product_option_id).exists():
-                return JsonResponse({"MESSAGE" : "CART_NOT_EXIST"}, status=404)
-
-            cart          = Cart.objects.get(user=user, product_option_id=product_option_id)
-            cart.quantity = quantity
-            cart.save()
-
-            if cart.quantity <= 0:
-                return JsonResponse({"message": "PRODUCT_QUANTITY_ERROR"}, status=400)
-
-            return JsonResponse({"message": "SUCCESS"}, status=201)
-
-        except Cart.DoesNotExist:
-            return JsonResponse({"message": "CART_NOT_EXIST"}, status=404)  
-
-        except KeyError:
-            return JsonResponse({"message": "KEY_ERROR"}, status=400)
 
     @login_decorator
     def delete(self, request):
