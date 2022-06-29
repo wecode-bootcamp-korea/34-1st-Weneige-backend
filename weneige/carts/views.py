@@ -11,8 +11,8 @@ class CartView(View):
     @login_decorator
     def post(self, request):
         try :
-            data              = json.loads(request.body)
-            user              = request.user
+            data = json.loads(request.body)
+            user = request.user
 
             for i in range(len(data)):
                 product_option_id = data[i]["product_option_id"]
@@ -62,11 +62,11 @@ class CartView(View):
 
     @login_decorator
     def delete(self, request):
-        cart_remove_list = request.GET.getlist('cart_id', None)
-        cart             = Cart.objects.filter(id__in=cart_remove_list, user=request.user)
+        cart_remove_list = request.GET.getlist('product_option_id', None)
+        carts            = Cart.objects.filter(product_option__in=cart_remove_list, user=request.user)
 
-        if not cart.exists():
+        if not carts:
             return JsonResponse({"message": "CART_NOT_EXIST"}, status=404)
         
-        cart.delete()
+        carts.delete()
         return JsonResponse({"message": "CART_DELETED"}, status=204)
