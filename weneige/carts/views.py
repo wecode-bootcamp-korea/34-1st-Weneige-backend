@@ -33,7 +33,7 @@ class CartView(View):
                     cart.quantity += quantity
                 cart.save()
                     
-            return JsonResponse({'MESSAGE' : 'CART_CREATED'}, status = 201)
+            return JsonResponse({'MESSAGE' : 'CART_UPDATED'}, status = 201)
         
         except KeyError:
             return JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status = 400)
@@ -48,7 +48,7 @@ class CartView(View):
 
         results     = [
             {
-                "product_options_id" : item.product_option.id,
+                "product_option_id" : item.product_option.id,
                 "kor_name"           : item.product_option.product.kor_name,
                 "color"              : item.product_option.color.name,
                 "price"              : int(item.product_option.product.price),
