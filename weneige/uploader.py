@@ -22,23 +22,23 @@ CSV_PATH_SUB = './csv/sub_categories.csv'
 CSV_PATH_TAGS = './csv/tags.csv'
 CSV_PATH_PRODUCT_TAGS = './csv/product_tags.csv'
 
-with open(CSV_PATH_PRODUCTS) as in_file:
-    data_reader = csv.reader(in_file)
-    next(data_reader, None) # 컬럼 이름 스킵
-    for row in data_reader:
-        if row[1]:
-            print(row[1])
-        
-        Product.objects.create(kor_name=row[1], eng_name=row[2], price=row[3], description=row[4])
-
-# with open(CSV_PATH_PRODUCT_IMAGES) as in_file:
+# with open(CSV_PATH_PRODUCTS) as in_file:
 #     data_reader = csv.reader(in_file)
 #     next(data_reader, None) # 컬럼 이름 스킵
 #     for row in data_reader:
 #         if row[1]:
-#             print(row[1], row[2])
+#             print(row[1])
         
-#         ProductImage.objects.create(product_id=row[1], image_url=row[2])
+#         Product.objects.create(kor_name=row[1], eng_name=row[2], price=row[3], description=row[4])
+
+with open(CSV_PATH_PRODUCT_IMAGES) as in_file:
+    data_reader = csv.reader(in_file)
+    next(data_reader, None) # 컬럼 이름 스킵
+    for row in data_reader:
+        if row[1]:
+            print(row[1], row[2])
+        
+        ProductImage.objects.create(product_id=row[2], image_url=row[1])
             
 # with open(CSV_PATH_COLORS) as in_file:
 #     data_reader = csv.reader(in_file)
@@ -49,13 +49,13 @@ with open(CSV_PATH_PRODUCTS) as in_file:
         
 #         Color.objects.create(name=row[1])
 
-with open(CSV_PATH_PRODUCT_OPTIONS) as in_file:
-    data_reader = csv.reader(in_file)
-    next(data_reader, None) # 컬럼 이름 스킵
-    for row in data_reader:
-        print(row[0], row[1], row[2], row[3])
+# with open(CSV_PATH_PRODUCT_OPTIONS) as in_file:
+#     data_reader = csv.reader(in_file)
+#     next(data_reader, None) # 컬럼 이름 스킵
+#     for row in data_reader:
+#         print(row[0], row[1], row[2], row[3])
         
-        ProductOption.objects.create(product_id=row[1], color_id=row[2], volume_id=row[3])
+#         ProductOption.objects.create(product_id=row[1], color_id=row[2], volume_id=row[3])
 
 # with open(CSV_PATH_MAIN) as in_file:
 #     data_reader = csv.reader(in_file)
