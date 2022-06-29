@@ -1,6 +1,6 @@
-from django.db import models
+from django.db             import models
 
-from core.models import BaseModel
+from core.models           import BaseModel
 from users.models          import User
 from products.models       import ProductOption
 
