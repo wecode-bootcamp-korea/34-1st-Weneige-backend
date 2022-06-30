@@ -14,6 +14,9 @@ class CartView(View):
             data = json.loads(request.body)
             user = request.user
 
+            if not data:
+                return JsonResponse({'MESSAGE' : 'NO_DATA_AVAILABLE'}, status = 403)
+
             for i in range(len(data)):
                 product_option_id = data[i]["product_option_id"]
                 quantity          = data[i]["quantity"]
