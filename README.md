@@ -21,15 +21,21 @@
 
 ## Features
 **User**
-- 회원가입 (POST)
-- 로그인 (POST)
+1. 회원가입 (POST)
+    - 회원가입 유효성 검사
+    - 비밀번호 bcrypt 암호화
+2. 로그인 (POST)
+    - 로그인 성공시 JWT Access Token 발급
 
 **Product**
-- 제품 리스트 조회 (GET)
-- 제품 상세 조회 (GET)
+1. 제품 리스트 조회 (GET)
+2. 제품 상세 조회 (GET)
 
 **Cart**
 - 장바구니 물품 추가 (POST)
 - 장바구니 물품 조회 (GET)
 - 장바구니 물품 수량 수정 (POST)
 - 장바구니 물품 삭제 (DELETE)
+
+## API Documentation
+- [API Documentation](https://velog.io/@chaduri7913/Weneige-%ED%86%B5%EC%8B%A0-%EC%9A%94%EC%B2%AD-%EC%96%91%EC%8B%9D)
