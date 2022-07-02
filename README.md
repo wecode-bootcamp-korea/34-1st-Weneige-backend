@@ -2,7 +2,7 @@
 
 
 ## Introduction
-화장품 브랜드 라네즈(https://www.laneige.com/kr/ko/index.html) 홈페이지 클론 코딩 프로젝트입니다.
+화장품 브랜드 [라네즈](https://www.laneige.com/kr/ko/index.html) 홈페이지 클론 코딩 프로젝트입니다.
 
 - 기간: 22.06.20 ~ 22.07.01
 - 구성: Front-End 4명 / Back-End 1명
