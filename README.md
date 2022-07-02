@@ -7,6 +7,14 @@
 - 기간: 22.06.20 ~ 22.07.01
 - 구성: Front-End 4명 / Back-End 1명
 - [프론트엔드 깃헙주소](https://github.com/wecode-bootcamp-korea/34-1st-Weneige-frontend)
+- 협업 툴: Github, Trello
+
+
+## Project Objective
+- Django 프레임 워크를 사용하여 백엔드 서버 구축
+- MySQL를 사용하여 DB 구축
+- 각 엔드 포인트에 맞는 API 구축
+- 최대한 효율적인 코드를 작성하여 서버의 효율성 
 
 <br/>
 
